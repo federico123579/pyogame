@@ -1,11 +1,10 @@
-import re
-import requests
-import unittest
-from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
 import json
-import math
-import random
+import re
+import unittest
+from datetime import datetime, timedelta
+
+import requests
+from bs4 import BeautifulSoup
 
 try:
     import constants as const
@@ -188,7 +187,7 @@ class OGame(object):
     def attacked(self):
         response = self.session.get(
             url=self.index_php + 'page=componentOnly'
-                '&component=eventList&action=fetchEventBox&ajax=1&asJson=1',
+            '&component=eventList&action=fetchEventBox&ajax=1&asJson=1',
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).json()
         if 0 < response['hostile']:
@@ -199,7 +198,7 @@ class OGame(object):
     def neutral(self):
         response = self.session.get(
             url=self.index_php + 'page=componentOnly'
-                '&component=eventList&action=fetchEventBox&ajax=1&asJson=1',
+            '&component=eventList&action=fetchEventBox&ajax=1&asJson=1',
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).json()
         if 0 < response['neutral']:
@@ -210,7 +209,7 @@ class OGame(object):
     def friendly(self):
         response = self.session.get(
             url=self.index_php + 'page=componentOnly'
-                '&component=eventList&action=fetchEventBox&ajax=1&asJson=1',
+            '&component=eventList&action=fetchEventBox&ajax=1&asJson=1',
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).json()
         if 0 < response['friendly']:
@@ -234,11 +233,15 @@ class OGame(object):
         player_list = []
         for i in range(1, 101):
             rawy = bs4.select('tr', attrs={'class': ''})[i]
+
             class PlayerData:
-                name = rawy.find('span', attrs={'class': 'playername'}).text.strip()
+                name = rawy.find(
+                    'span', attrs={'class': 'playername'}).text.strip()
                 player_id = int(rawy['id'].replace("position", ""))
-                rank = int(rawy.find('td', attrs={'class': 'position'}).text.strip())
-                points = int(rawy.find('td', attrs={'class': 'score'}).text.strip().replace(".", "").replace(",", ""))
+                rank = int(
+                    rawy.find('td', attrs={'class': 'position'}).text.strip())
+                points = int(rawy.find('td', attrs={'class': 'score'}).text.strip().replace(
+                    ".", "").replace(",", ""))
                 list = [
                     name, player_id, rank, points
                 ]
@@ -303,7 +306,8 @@ class OGame(object):
                         listofelems[index][0] = elem[0] + item_duration[0]
                 else:
                     if listofelems[index][0][:9] == listofelems[max(index - 1, 0)][0][:9]:
-                        listofelems[index][0] = listofelems[index][0] + item_duration[2]
+                        listofelems[index][0] = listofelems[index][0] + \
+                            item_duration[2]
         return listofelems
 
     def buy_item(self, id, activate_it=False):
@@ -312,7 +316,8 @@ class OGame(object):
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).text
         if activate_it:
-            activateToken = re.search(r'activateToken="(.*)";', str(response)).group(1)
+            activateToken = re.search(
+                r'activateToken="(.*)";', str(response)).group(1)
             response2 = self.session.post(
                 url=self.index_php + 'page=inventory',
                 data={'ajax': 1,
@@ -329,12 +334,12 @@ class OGame(object):
                       'token': buyToken},
                 headers={'X-Requested-With': 'XMLHttpRequest'}
             ).json()
-        list = []
         if not response2['error']:
             if activate_it:
                 item_data = response2['message']['item']
             else:
                 item_data = response2['item']
+
             class Item:
                 name = item_data['name']
                 costs = int(item_data['costs'])
@@ -353,7 +358,8 @@ class OGame(object):
             url=self.index_php + 'page=shop&ajax=1&type={}'.format(id),
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).text
-        activateToken = re.search(r'var token="(.*)";v', str(response)).group(1)
+        activateToken = re.search(
+            r'var token="(.*)";v', str(response)).group(1)
         response2 = self.session.post(
             url=self.index_php + 'page=inventory&item={}&ajax=1'.format(id),
             data={'ajax': 1,
@@ -361,9 +367,9 @@ class OGame(object):
                   'referrerPage': "shop"},
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).json()
-        list = []
         if not response2['error']:
             item_data = response2['message']['item']
+
             class Item:
                 name = item_data['name']
                 costs = int(item_data['costs'])
@@ -462,9 +468,11 @@ class OGame(object):
         for planet in self.landing_page.find_all(class_='planetlink'):
             planet_fields = re.search(r'\((.*)\/(.*)\)', planet['title'])
             temperatures = re.search(r'([0-9]+)°.* ([0-9]+)°', planet['title'])
+
             class Celestial:
                 coordinates = re.search(r'\[(.*)]', planet['title']).group(1)
-                coordinates = [int(coords) for coords in coordinates.split(':')]
+                coordinates = [int(coords)
+                               for coords in coordinates.split(':')]
                 coordinates.append(const.destination.planet)
                 diameter = re.search(r'/>(.*)km', planet['title']).group(1)
                 diameter = int("".join(re.split('\\.|\\,', diameter)))
@@ -485,9 +493,11 @@ class OGame(object):
         infos = []
         for moon in self.landing_page.find_all(class_='moonlink'):
             moon_fields = re.search(r'\((.*)\/(.*)\)', moon['title'])
+
             class Celestial:
                 coordinates = re.search(r'\[(.*)]', moon['title']).group(1)
-                coordinates = [int(coords) for coords in coordinates.split(':')]
+                coordinates = [int(coords)
+                               for coords in coordinates.split(':')]
                 coordinates.append(const.destination.moon)
                 diameter = re.search(r'br>(.*)km', moon['title']).group(1)
                 diameter = int("".join(re.split('\\.|\\,', diameter)))
@@ -519,8 +529,10 @@ class OGame(object):
             r'textContent\[7] = "(.*)>(.*?) \(Place (.*?) (.*)<',
             response
         )
+
         class Celestial:
-            diameter = int(textContent1.group(1).replace('.', '').replace(',', ''))
+            diameter = int(textContent1.group(
+                1).replace('.', '').replace(',', ''))
             used = int(textContent1.group(2))
             total = int(textContent1.group(4))
             free = total - used
@@ -529,7 +541,8 @@ class OGame(object):
                 textContent3[1]
             ]
             coordinates = OGame.celestial_coordinates(self, id)
-            points = int(textContent7.group(2).replace(".", "").replace(',', ''))
+            points = int(textContent7.group(
+                2).replace(".", "").replace(',', ''))
             rank = int(textContent7.group(3).replace(".", "").replace(',', ''))
         return Celestial
 
@@ -599,10 +612,11 @@ class OGame(object):
         for tooltip in queue:
             if tooltip.find(class_="queuePic"):
                 sname = tooltip.find(class_="queuePic")['title']
-                samount = tooltip.text.replace("\n","").strip()
+                samount = tooltip.text.replace("\n", "").strip()
                 if sname in name_list:
                     tindex = name_list.index(sname)
-                    amount[tindex] += int(samount.replace(".", "").replace(",", ""))
+                    amount[tindex] += int(samount.replace(".",
+                                          "").replace(",", ""))
 
         class Shipyard:
             def __init__(self, i):
@@ -669,7 +683,8 @@ class OGame(object):
         return mergeClass(my_dict)
 
     def tooltip_names_import(self):
-        import inspect, os.path
+        import inspect
+        import os.path
 
         path = inspect.getframeinfo(inspect.currentframe()).filename
         tooltip_path = path.replace("__init__", "tooltip_names")
@@ -680,7 +695,9 @@ class OGame(object):
             if w_file.write("import re") > 0:
                 w_file.close()
         if os.path.exists(tooltip_path):
-            r_file = open(tooltip_path, 'r'); r_data = r_file.readlines(); r_file.close()
+            r_file = open(tooltip_path, 'r')
+            r_data = r_file.readlines()
+            r_file.close()
             if r_data is not None:
                 if "class " + str(self.language) + "_tooltips:\n" in r_data:
                     infos_available = True
@@ -710,7 +727,8 @@ class OGame(object):
         if infos_available:
             import importlib
             def_name = str(self.language) + "_tooltips"
-            tooltip = getattr(importlib.import_module('ogame.tooltip_names', __name__), def_name)
+            tooltip = getattr(importlib.import_module(
+                'ogame.tooltip_names', __name__), def_name)
             return tooltip.list
         else:
             import_ships = ship_names(self)
@@ -721,7 +739,7 @@ class OGame(object):
             for i, names in enumerate(imported_data):
                 text = "'" + names + "',"
                 if i+1 == len(imported_data):
-                    text = text.replace(",","")
+                    text = text.replace(",", "")
                 w_text.append(text)
             w_text.append("]")
             w_file = open(tooltip_path, 'a')
@@ -734,13 +752,15 @@ class OGame(object):
             planet = celestial.find(class_='planetlink')
             if str(id) in planet['href']:
                 coordinates = re.search(r'\[(.*)]', planet['title']).group(1)
-                coordinates = [int(coords) for coords in coordinates.split(':')]
+                coordinates = [int(coords)
+                               for coords in coordinates.split(':')]
                 coordinates.append(const.destination.planet)
                 return coordinates
             moon = celestial.find(class_='moonlink')
             if moon and str(id) in moon['href']:
                 coordinates = re.search(r'\[(.*)]', moon['title']).group(1)
-                coordinates = [int(coords) for coords in coordinates.split(':')]
+                coordinates = [int(coords)
+                               for coords in coordinates.split(':')]
                 coordinates.append(const.destination.moon)
                 return coordinates
 
@@ -780,11 +800,13 @@ class OGame(object):
                     storage = stor.find_all('td', attrs={'class': 'left2'})
                     break
             storage = [to_int(store.span['title']) for store in storage]
-            darkmatter = to_int(bs4.find(id='resources_darkmatter')['data-raw'])
+            darkmatter = to_int(
+                bs4.find(id='resources_darkmatter')['data-raw'])
             energy = to_int(bs4.find(id='resources_energy')['data-raw'])
-            
+
             if bs4.find(id='resources_population')['data-raw']:
-                population = to_int(bs4.find(id='resources_population')['data-raw'])
+                population = to_int(
+                    bs4.find(id='resources_population')['data-raw'])
                 food = to_int(bs4.find(id='resources_food')['data-raw'])
         return Resources
 
@@ -854,7 +876,7 @@ class OGame(object):
     def supply(self, id):
         response = self.session.get(
             url=self.index_php + 'page=ingame&component=supplies&cp={}'
-                .format(id)
+            .format(id)
         ).text
         bs4 = BeautifulSoup4(response)
         levels = [
@@ -871,7 +893,8 @@ class OGame(object):
             def __init__(self, i):
                 self.level = levels[i]
                 self.is_possible = OGame.isPossible(technologyStatus[i])
-                self.in_construction = OGame.inConstruction(technologyStatus[i])
+                self.in_construction = OGame.inConstruction(
+                    technologyStatus[i])
 
         class Supplies(object):
             metal_mine = Supply(0)
@@ -908,7 +931,8 @@ class OGame(object):
             def __init__(self, i):
                 self.level = levels[i]
                 self.is_possible = OGame.isPossible(technologyStatus[i])
-                self.in_construction = OGame.inConstruction(technologyStatus[i])
+                self.in_construction = OGame.inConstruction(
+                    technologyStatus[i])
 
         class Facilities(object):
             robotics_factory = Facility(0)
@@ -943,7 +967,8 @@ class OGame(object):
             def __init__(self, i):
                 self.level = levels[i]
                 self.is_possible = OGame.isPossible(technologyStatus[i])
-                self.in_construction = OGame.inConstruction(technologyStatus[i])
+                self.in_construction = OGame.inConstruction(
+                    technologyStatus[i])
 
         class LfFacilities(object):
             residential_sector = LfFacilitie(0)
@@ -986,7 +1011,8 @@ class OGame(object):
             def __init__(self, i):
                 self.level = levels[i]
                 self.is_possible = OGame.isPossible(technologyStatus[i])
-                self.in_construction = OGame.inConstruction(technologyStatus[i])
+                self.in_construction = OGame.inConstruction(
+                    technologyStatus[i])
 
         class Facilities(object):
             robotics_factory = Facility(0)
@@ -995,14 +1021,16 @@ class OGame(object):
             sensor_phalanx = Facility(3)
             jump_gate = Facility(4)
             fields = [
-                int(re.search(r'.\(([0-9]+)\/([0-9]+)\)', moon_data).group(ibm))
+                int(re.search(r'.\(([0-9]+)\/([0-9]+)\)',
+                    moon_data).group(ibm))
                 for ibm in range(1, 3)
             ]
 
         return Facilities
 
     def traider(self, id):
-        raise NotImplementedError("function not implemented yet PLS contribute")
+        raise NotImplementedError(
+            "function not implemented yet PLS contribute")
 
     def research(self, id=None):
         if id is None:
@@ -1028,7 +1056,8 @@ class OGame(object):
             def __init__(self, i):
                 self.level = levels[i]
                 self.is_possible = OGame.isPossible(technologyStatus[i])
-                self.in_construction = OGame.inConstruction(technologyStatus[i])
+                self.in_construction = OGame.inConstruction(
+                    technologyStatus[i])
 
         class Researches(object):
             energy = Research(0)
@@ -1049,7 +1078,7 @@ class OGame(object):
             armor = Research(15)
 
         return Researches
-    
+
     def lf_research_humans(self, id=None):
         if id is None:
             id = self.planet_ids()[0]
@@ -1080,7 +1109,8 @@ class OGame(object):
                 if i <= technology_status.count('on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
-                    self.in_construction = OGame.inConstruction(technology_status[i])
+                    self.in_construction = OGame.inConstruction(
+                        technology_status[i])
                 else:
                     self.level = 0
                     self.is_possible = False
@@ -1138,7 +1168,8 @@ class OGame(object):
                 if i <= technology_status.count('on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
-                    self.in_construction = OGame.inConstruction(technology_status[i])
+                    self.in_construction = OGame.inConstruction(
+                        technology_status[i])
                 else:
                     self.level = 0
                     self.is_possible = False
@@ -1196,7 +1227,8 @@ class OGame(object):
                 if i <= technology_status.count('on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
-                    self.in_construction = OGame.inConstruction(technology_status[i])
+                    self.in_construction = OGame.inConstruction(
+                        technology_status[i])
                 else:
                     self.level = 0
                     self.is_possible = False
@@ -1254,7 +1286,8 @@ class OGame(object):
                 if i <= technology_status.count('on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
-                    self.in_construction = OGame.inConstruction(technology_status[i])
+                    self.in_construction = OGame.inConstruction(
+                        technology_status[i])
                 else:
                     self.level = 0
                     self.is_possible = False
@@ -1289,7 +1322,7 @@ class OGame(object):
         ).text
         bs4 = BeautifulSoup4(response)
         ships_amount = [
-            int(level['data-value'].replace(",","").replace(".",""))
+            int(level['data-value'].replace(",", "").replace(".", ""))
             for level in bs4.find_all(class_='amount')
         ]
         technologyStatus = [
@@ -1301,7 +1334,8 @@ class OGame(object):
             def __init__(self, i):
                 self.amount = ships_amount[i]
                 self.is_possible = OGame.isPossible(technologyStatus[i])
-                self.in_construction = OGame.inConstruction(technologyStatus[i])
+                self.in_construction = OGame.inConstruction(
+                    technologyStatus[i])
 
         class Crawler:
             if id not in OGame.moon_ids(self):
@@ -1327,7 +1361,7 @@ class OGame(object):
         ).text
         bs4 = BeautifulSoup4(response)
         defences_amount = [
-            int(level['data-value'].replace(",","").replace(".",""))
+            int(level['data-value'].replace(",", "").replace(".", ""))
             for level in bs4.find_all(class_='amount')
         ]
         technologyStatus = [
@@ -1339,7 +1373,8 @@ class OGame(object):
             def __init__(self, i):
                 self.amount = defences_amount[i]
                 self.is_possible = OGame.isPossible(technologyStatus[i])
-                self.in_construction = OGame.inConstruction(technologyStatus[i])
+                self.in_construction = OGame.inConstruction(
+                    technologyStatus[i])
 
         Defences = self.deff_class(Defence)
         return Defences
@@ -1388,10 +1423,13 @@ class OGame(object):
             )
             debris_resources = [0, 0, 0]
             if has_debris:
-                debris_resources = row.find_all('li', {'class': 'debris-content'})
+                debris_resources = row.find_all(
+                    'li', {'class': 'debris-content'})
                 debris_resources = [
-                    int(debris_resources[0].text.split(':')[1].replace(',', '').replace('.', '')),
-                    int(debris_resources[1].text.split(':')[1].replace(',', '').replace('.', '')),
+                    int(debris_resources[0].text.split(':')[
+                        1].replace(',', '').replace('.', '')),
+                    int(debris_resources[1].text.split(':')[
+                        1].replace(',', '').replace('.', '')),
                     0
                 ]
             dlist = [
@@ -1448,7 +1486,8 @@ class OGame(object):
                 if 'minute15' in atag['class']:
                     flag_activity[i] = 15
                 elif 'showMinutes' in atag['class']:
-                    flag_activity[i] = int(re.search(r'([0-9]+)', atag.text).group(1))
+                    flag_activity[i] = int(
+                        re.search(r'([0-9]+)', atag.text).group(1))
                 else:
                     flag_activity[i] = -1
 
@@ -1461,16 +1500,18 @@ class OGame(object):
                 debris_data = debris_fields[debris_index]
 
             if moon:
-                moon_size_row = int(row.select_one("td.moon span#moonsize").text.split()[0])
+                moon_size_row = int(row.select_one(
+                    "td.moon span#moonsize").text.split()[0])
             else:
                 moon_size_row = 0
                 flag_activity[1] = -2
 
             debris_16 = bs4.find(class_="expeditionDebrisSlotBox")
             if debris_16:
-                debris_data = debris_16.find(class_='ListLinks').text.replace(".","")
+                debris_data = debris_16.find(
+                    class_='ListLinks').text.replace(".", "")
                 debris_16 = [
-                    int(data.replace(",","").replace(".",""))
+                    int(data.replace(",", "").replace(".", ""))
                     for data in re.findall(r'\d+', debris_data)
                 ]
             else:
@@ -1526,10 +1567,13 @@ class OGame(object):
             )
             debris_resources = [0, 0, 0]
             if debris:
-                debris_resources = row.find_all('li', {'class': 'debris-content'})
+                debris_resources = row.find_all(
+                    'li', {'class': 'debris-content'})
                 debris_resources = [
-                    int(debris_resources[0].text.split(':')[1].replace(',', '').replace('.', '')),
-                    int(debris_resources[1].text.split(':')[1].replace(',', '').replace('.', '')),
+                    int(debris_resources[0].text.split(':')[
+                        1].replace(',', '').replace('.', '')),
+                    int(debris_resources[1].text.split(':')[
+                        1].replace(',', '').replace('.', '')),
                     0
                 ]
 
@@ -1557,11 +1601,14 @@ class OGame(object):
             return []
 
     def officers(self):
-        commander_element = self.landing_page.find_partial(class_='on commander')
+        commander_element = self.landing_page.find_partial(
+            class_='on commander')
         admiral_element = self.landing_page.find_partial(class_='on admiral')
         engineer_element = self.landing_page.find_partial(class_='on engineer')
-        geologist_element = self.landing_page.find_partial(class_='on geologist')
-        technocrat_element = self.landing_page.find_partial(class_='on technocrat')
+        geologist_element = self.landing_page.find_partial(
+            class_='on geologist')
+        technocrat_element = self.landing_page.find_partial(
+            class_='on technocrat')
 
         class Officers(object):
             commander = commander_element is not None
@@ -1573,13 +1620,14 @@ class OGame(object):
         return Officers
 
     def shop(self):
-        raise NotImplementedError("function not implemented yet PLS contribute")
+        raise NotImplementedError(
+            "function not implemented yet PLS contribute")
 
     def fleet_coordinates(self, event, Coords):
         coordinate = [
             coords.find(class_=Coords).a.text
             for coords in event
-                if coords.find(class_=Coords).a is not None  # optional
+            if coords.find(class_=Coords).a is not None  # optional
         ]
         coordinate = [
             const.convert_to_coordinates(coords)
@@ -1696,7 +1744,8 @@ class OGame(object):
             for timestamp in arrival_times
         ]
 
-        destinations = self.fleet_coordinates(fleetDetails, 'destinationCoords')
+        destinations = self.fleet_coordinates(
+            fleetDetails, 'destinationCoords')
         origins = self.fleet_coordinates(fleetDetails, 'originCoords')
 
         fleets = []
@@ -1765,12 +1814,16 @@ class OGame(object):
             if not ship_names:
                 ship_names = aquire_shipnames(self)
 
-        tooltip_data = BeautifulSoup4(pre_parse(tooltip)).find_all("td")  # , 'html5lib'
+        tooltip_data = BeautifulSoup4(
+            pre_parse(tooltip)).find_all("td")  # , 'html5lib'
         data_set = 0
-        ship_amount = []; ship_types = []; shipments = []
+        ship_amount = []
+        ship_types = []
+        shipments = []
         for data in tooltip_data:
             if data.text != '\xa0':
-                text = data.text.replace(":", "").replace(".", "").replace(",", "")
+                text = data.text.replace(":", "").replace(
+                    ".", "").replace(",", "")
                 if data_set < 1:
                     if text.isdigit():
                         ship_amount.append(int(text))
@@ -1821,7 +1874,7 @@ class OGame(object):
         eventFleet = [
             child.parent.parent
             for child in eventFleet
-            if child.parent.parent['id'][9:10] is not 'u'
+            if child.parent.parent['id'][9:10] != 'u'
         ]
 
         fleet_ids = [id['id'] for id in eventFleet]
@@ -1878,7 +1931,7 @@ class OGame(object):
     def jump_fleet(self, origin_id, target_id, ships):
         self.session.get(
             url='{}page=ingame&component=facilities&cp={}'
-                 .format(self.index_php, origin_id)
+            .format(self.index_php, origin_id)
         )
 
         response1 = self.session.get(self.index_php + 'page=jumpgatelayer')
@@ -1888,7 +1941,8 @@ class OGame(object):
             ready = re.search(r' <div id="(.*)"', response1.text)
             cooldown = re.search(r'\("#cooldown"\), (.*),', response1.text)
             if ready and cooldown:
-                return int(cooldown.group(1))                            # returns cooldown time in seconds
+                # returns cooldown time in seconds
+                return int(cooldown.group(1))
             return False
         form_data = {'token': jump_token,
                      'zm': target_id}
@@ -1908,7 +1962,7 @@ class OGame(object):
             return False
 
     def phalanx(self, coordinates, id):
-        raise NotImplemented(
+        raise NotImplementedError(
             'Phalanx get you banned if used with invalid parameters')
 
     def send_message(self, player_id, msg):
@@ -1931,7 +1985,7 @@ class OGame(object):
     def send_buddy(self, player_id, msg):
         response = self.session.get(
             url=self.index_php +
-                f'page=ingame&component=buddies&action=7&id={player_id}&ajax=1',
+            f'page=ingame&component=buddies&action=7&id={player_id}&ajax=1',
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).text
         chat_token = re.search("value='(.*)'", response).group(1)
@@ -1950,7 +2004,8 @@ class OGame(object):
         if content.table:
             return True
         else:
-            print(" ".join(content.text.split()))            # output 'You have already sent a request to this player.' / 'Invalid player.'
+            # output 'You have already sent a request to this player.' / 'Invalid player.'
+            print(" ".join(content.text.split()))
             return False
 
     def reward_system(self):
@@ -1964,11 +2019,12 @@ class OGame(object):
     def rewards(self, tier=None, reward=None):
         def grab_token():
             response1 = self.session.get(
-                url=self.index_php + f'page=ingame&component=rewarding&tab=rewards',
+                url=self.index_php + 'page=ingame&component=rewarding&tab=rewards',
                 headers={'X-Requested-With': 'XMLHttpRequest'})
             if response1.status_code != 200:
                 return False
             return response1
+
         def reward_data(show_tier=tier):
             response1 = grab_token()
             if response1 is False:
@@ -1981,8 +2037,10 @@ class OGame(object):
                 headers={'X-Requested-With': 'XMLHttpRequest'})
             if response2.status_code != 200:
                 return False
-            item_names = re.findall(r'"rewardName\\">([^<\\]*)', response2.text)
-            quantity = re.findall(r'"quantity\\">\\\D* ([^<\\]*)\\n', response2.text)
+            item_names = re.findall(
+                r'"rewardName\\">([^<\\]*)', response2.text)
+            quantity = re.findall(
+                r'"quantity\\">\\\D* ([^<\\]*)\\n', response2.text)
             item_ids = re.findall(r'data-id=\\"([0-9]+)', response2.text)
             tritium = re.findall(r'\\u([^ ]*)', response2.text)
             return [response2, item_names, quantity, item_ids, tritium]
@@ -2001,6 +2059,7 @@ class OGame(object):
                       'token': ajax_token},
                 headers={'X-Requested-With': 'XMLHttpRequest'}
             )
+
             class selectedReward:
                 status = response3.json()['status']
                 name = data[1][item]
@@ -2011,17 +2070,21 @@ class OGame(object):
             response = grab_token()
             if response is False:
                 return False
-            max_tier = int(re.findall(r'data-tier="([0-9])', response.text)[-1])
+            max_tier = int(re.findall(
+                r'data-tier="([0-9])', response.text)[-1])
             progress = re.search(r'title=.*([0-9])\/([0-9])', response.text)
             item_list = []
             claimable_list = []
             for ipx in range(max_tier):
                 data = reward_data(ipx+1)
-                item_list.append([(data[1][i], data[2][i], data[3][i]) for i in range(3)])
+                item_list.append(
+                    [(data[1][i], data[2][i], data[3][i]) for i in range(3)])
                 claimable_list.append(data[4][0] == data[4][1])
+
             class TierList:
                 highest_tier = max_tier
-                event_progress = [int(progress.group(1)), int(progress.group(2))]
+                event_progress = [int(progress.group(1)),
+                                  int(progress.group(2))]
                 claimable = claimable_list
                 rewards = item_list
                 list = [highest_tier, event_progress, claimable, rewards]
@@ -2039,27 +2102,31 @@ class OGame(object):
         chat_ids = [id_s for id_s in content]
         messages = [content[ids] for ids in chat_ids]
         message_data = []
-        time_f = "%Y-%m-%d %H:%M:%S"; time_ff = "%H:%M:%S-%d.%m.%Y"
+        time_f = "%Y-%m-%d %H:%M:%S"
+        time_ff = "%H:%M:%S-%d.%m.%Y"
         for data in messages:
             chat_history = []
             if data['unreadCounter'] >= 1:
                 response2 = self.session.post(url=self.index_php + 'page=ajaxChat',
-                                      data={'playerId': int(data['partnerId']), 'mode': 2,
-                                            'ajax': 1, 'updateUnread': 1},
-                                      headers={'X-Requested-With': 'XMLHttpRequest'})  # read message/mark as read
+                                              data={'playerId': int(data['partnerId']), 'mode': 2,
+                                                    'ajax': 1, 'updateUnread': 1},
+                                              headers={'X-Requested-With': 'XMLHttpRequest'})  # read message/mark as read
                 chat_data = response2.json()['data']
                 chat_overview = response2.json()['chatItems']
                 authors_list = re.findall(r'w">\n (.*)</', chat_data)
                 authors = [author.strip() for author in authors_list][-10:]
-                messages = [chat['chatContent'] for chat in chat_overview][-10:]
+                messages = [chat['chatContent']
+                            for chat in chat_overview][-10:]
                 chat_history = [[authors[count], message]
                                 for count, message in enumerate(messages)]
+
             class Message:
                 player = data['partnerName']
                 player_id = data['partnerId']
                 status = data['unreadCounter']
                 text = data['text']
-                time = datetime.strptime(data['time'], time_f).strftime(time_ff)
+                time = datetime.strptime(
+                    data['time'], time_f).strftime(time_ff)
                 alliance = data['allianceName']
                 rank = data['highscorePosition']
                 chat = chat_history
@@ -2082,7 +2149,8 @@ class OGame(object):
                            f'&component=overview&cp={id}'
             }
         ).text
-        token_rename = re.search("name='token' value='(.*)'", response).group(1)
+        token_rename = re.search(
+            "name='token' value='(.*)'", response).group(1)
         param = {'page': 'planetRename'}
         data = {
             'newPlanetName': new_name,
@@ -2112,7 +2180,8 @@ class OGame(object):
             params={'page': 'planetlayer'},
             headers=header
         ).text
-        response = response[response.find('input type="hidden" name="abandon" value="'):]
+        response = response[response.find(
+            'input type="hidden" name="abandon" value="'):]
         code_abandon = re.search(
             'name="abandon" value="(.*)"', response
         ).group(1)
@@ -2121,7 +2190,7 @@ class OGame(object):
         ).group(1)
         response = self.session.post(
             url=self.index_php +
-                'page=ingame&component=overview&action=confirmPlanetGiveup&ajax=1&asJson=1',
+            'page=ingame&component=overview&action=confirmPlanetGiveup&ajax=1&asJson=1',
             data={
                 'abandon': code_abandon,
                 'token': token_abandon,
@@ -2135,13 +2204,13 @@ class OGame(object):
         if new_token:
             self.session.post(
                 url=self.index_php +
-                    'page=ingame&component=overview&action=planetGiveup&ajax=1&asJson=1',
+                'page=ingame&component=overview&action=planetGiveup&ajax=1&asJson=1',
                 data={
                     'abandon': code_abandon,
                     'token': new_token,
                     'password': self.password,
                 },
-            headers={'X-Requested-With': 'XMLHttpRequest'}
+                headers={'X-Requested-With': 'XMLHttpRequest'}
             ).json()
             return True
         else:
@@ -2185,20 +2254,24 @@ class OGame(object):
             for resource in resources_list.find_all('li'):
                 resource_name = resource.find('div')['class']
                 resource_name.remove('resourceIcon')
-                resources_data[resource_name[0]] = int(resource['title'].replace('.', ''))
+                resources_data[resource_name[0]] = int(
+                    resource['title'].replace('.', ''))
 
             def get_tech_and_quantity(tech_type):
                 tech_list = bs4.find('ul', {'data-type': tech_type})
                 # return None if level of espionage too low to retrieve information
                 if "unable" in tech_list.text:
-                    yield(None, None)
+                    yield (None, None)
                 else:
                     for tech in tech_list.find_all('li', {'class': 'detail_list_el'}):
-                        tech_id = int(re.search(r'([0-9]+)', tech.find('img')['class'][0]).group(1))
-                        tech_amount = int(tech.find('span', 'fright').text.replace('.', ''))
+                        tech_id = int(
+                            re.search(r'([0-9]+)', tech.find('img')['class'][0]).group(1))
+                        tech_amount = int(
+                            tech.find('span', 'fright').text.replace('.', ''))
                         yield (tech_id, tech_amount)
 
-            spied_data = {'ships': {}, 'defense': {}, 'buildings': {}, 'research': {}}
+            spied_data = {'ships': {}, 'defense': {},
+                          'buildings': {}, 'research': {}}
             const_data = {
                 'ships': [const.ships.ship_name, 'shipyard'],
                 'defense': [const.buildings.defense_name, 'defenses'],
@@ -2208,12 +2281,13 @@ class OGame(object):
             for tech_type in spied_data.keys():
                 for tech_id, tech_amount in get_tech_and_quantity(tech_type):
                     if tech_id is None:
-                        spied_data[tech_type] = "detail_list_fail" # replace dict with message string
+                        # replace dict with message string
+                        spied_data[tech_type] = "detail_list_fail"
                         break
                     elif tech_type == 'ships' and tech_id in [212, 217]:
-                            tech_name = const.buildings.building_name(
-                                (tech_id, None, None)
-                            )
+                        tech_name = const.buildings.building_name(
+                            (tech_id, None, None)
+                        )
                     else:
                         tech_name = const_data[tech_type][0](
                             (tech_id, None, const_data[tech_type][1])
@@ -2245,11 +2319,11 @@ class OGame(object):
 
     def get_page_messages(self, page, tab_id):
         payload = {
-                "messageId": "-1",
-                "tab": '{}'.format(tab_id),
-                "action": "107",
-                "pagination": '{}'.format(page),
-                "ajax": "1",
+            "messageId": "-1",
+            "tab": '{}'.format(tab_id),
+            "action": "107",
+            "pagination": '{}'.format(page),
+            "ajax": "1",
         }
 
         return self.session.get(url=self.index_php + 'page=messages', params=payload)
@@ -2257,7 +2331,8 @@ class OGame(object):
     def extract_other_message(self, response):
         msgs = []
         bs4 = BeautifulSoup4(response.text)
-        nb_page = bs4.select("ul.pagination li.paginator")[-1].attrs['data-page']
+        nb_page = bs4.select(
+            "ul.pagination li.paginator")[-1].attrs['data-page']
         msgs_raw = bs4.select("li.msg")
         msg_id = 0
         message_date = 'False'
@@ -2270,13 +2345,16 @@ class OGame(object):
             else:
                 continue
             if 'msg_date' in str(msg_raw):
-                message_date = str(msg_raw.select_one("li.msg div.msg_head span.fright span.msg_date").text)
+                message_date = str(msg_raw.select_one(
+                    "li.msg div.msg_head span.fright span.msg_date").text)
                 msgs.append(message_date)
             if 'msg_sender' in str(msg_raw):
-                message_sender = str(msg_raw.select_one("li.msg div.msg_head span.msg_sender").text)
+                message_sender = str(msg_raw.select_one(
+                    "li.msg div.msg_head span.msg_sender").text)
                 msgs.append(message_sender)
             if 'msg_content' in str(msg_raw):
-                message_text = str(msg_raw.select_one("li.msg span.msg_content").text.strip())
+                message_text = str(msg_raw.select_one(
+                    "li.msg span.msg_content").text.strip())
                 msgs.append(message_text)
 
         return msgs, nb_page
@@ -2300,7 +2378,8 @@ class OGame(object):
     def extract_combat_summary_reports_message(self, response):
         msgs = []
         bs4 = BeautifulSoup4(response.text)
-        nb_page = bs4.select("ul.pagination li.paginator")[-1].attrs['data-page']
+        nb_page = bs4.select(
+            "ul.pagination li.paginator")[-1].attrs['data-page']
         msgs_raw = bs4.select("li.msg")
         for msg_raw in msgs_raw:
             if 'data-msg-id' in str(msg_raw):
@@ -2308,8 +2387,10 @@ class OGame(object):
             else:
                 continue
 
-            message_destination = str(msg_raw.select_one("div.msg_head a").text)
-            message_destination = const.convert_to_coordinates(message_destination)
+            message_destination = str(
+                msg_raw.select_one("div.msg_head a").text)
+            message_destination = const.convert_to_coordinates(
+                message_destination)
 
             fleet_lost_first_round_message = False
             if 'planet' in str(msg_raw.select_one("div.msg_head figure")):
@@ -2323,55 +2404,64 @@ class OGame(object):
                                                     int(message_destination[2]), int(message_destination_type))
 
             if not fleet_lost_first_round_message:
-                res_title = msg_raw.select("span.msg_content div.combatLeftSide span")[1].attrs['title']
-                re_res = re.search('([\\d.,]+)<br/>[^\\d]*([\\d.,]+)<br/>[^\\d]*([\\d.,]+)', res_title)
+                res_title = msg_raw.select("span.msg_content div.combatLeftSide span")[
+                    1].attrs['title']
+                re_res = re.search(
+                    '([\\d.,]+)<br/>[^\\d]*([\\d.,]+)<br/>[^\\d]*([\\d.,]+)', res_title)
                 re_res = const.resources(re_res[1], re_res[2], re_res[3])
 
-                debris_field_title = msg_raw.select("span.msg_content div.combatLeftSide span")[2].attrs['title']
+                debris_field_title = msg_raw.select(
+                    "span.msg_content div.combatLeftSide span")[2].attrs['title']
 
-                res_text = msg_raw.select("span.msg_content div.combatLeftSide span")[1]
-                re_res_text = re.search('[\\d.,]+[^\\d]*([\\d.,]+)', str(res_text))
+                res_text = msg_raw.select(
+                    "span.msg_content div.combatLeftSide span")[1]
+                re_res_text = re.search(
+                    '[\\d.,]+[^\\d]*([\\d.,]+)', str(res_text))
                 re_res_text = re_res_text[1]
 
                 message_date = str(msg_raw.select_one("span.msg_date").text)
 
-                message_text = msg_raw.select("li.msg span.msg_content span.msg_ctn")
+                message_text = msg_raw.select(
+                    "li.msg span.msg_content span.msg_ctn")
 
                 attacker_name_message = message_text[0].text
                 attacker_name_message = attacker_name_message[
-                                        attacker_name_message.find("(") + 1:attacker_name_message.find(")")]
+                    attacker_name_message.find("(") + 1:attacker_name_message.find(")")]
 
                 attacker_point_lost_message = message_text[0].text
                 attacker_point_lost_message = attacker_point_lost_message[
-                                              attacker_point_lost_message.find(attacker_name_message) + len(
-                                                  attacker_name_message) + 3:]
+                    attacker_point_lost_message.find(attacker_name_message) + len(
+                        attacker_name_message) + 3:]
 
                 defender_name_message = message_text[3].text
                 defender_name_message = defender_name_message[
-                                            defender_name_message.find("(") + 1:defender_name_message.find(")")]
+                    defender_name_message.find("(") + 1:defender_name_message.find(")")]
 
                 defender_point_lost_message = message_text[3].text
                 defender_point_lost_message = defender_point_lost_message[
-                                              defender_point_lost_message.find(defender_name_message) + len(
-                                                  defender_name_message) + 3:]
+                    defender_point_lost_message.find(defender_name_message) + len(
+                        defender_name_message) + 3:]
 
                 repaired_message = message_text[4].text
                 repaired_message = repaired_message[
-                                   repaired_message.find(":") + 1:]
+                    repaired_message.find(":") + 1:]
 
                 try:
                     moon_chance_message = message_text[5].text
                     moon_chance_message = moon_chance_message[
-                                          moon_chance_message.find(":") + 1:moon_chance_message.find("%")]
+                        moon_chance_message.find(":") + 1:moon_chance_message.find("%")]
                 except:
                     moon_chance_message = None
 
                 # monn_created_message = # ToDo Find color green?....
 
-                link = str(msg_raw.select_one("div.msg_actions a span.icon_attack").parent)
+                link = str(msg_raw.select_one(
+                    "div.msg_actions a span.icon_attack").parent)
                 link = link.replace("&amp;", "&")
-                re_link = re.search('galaxy=(\\d+)&system=(\\d+)&position=(\\d+)&type=(\\d+)&', str(link))
-                re_link = const.coordinates(int(re_link[1]), int(re_link[2]), int(re_link[3]), int(re_link[4]))
+                re_link = re.search(
+                    'galaxy=(\\d+)&system=(\\d+)&position=(\\d+)&type=(\\d+)&', str(link))
+                re_link = const.coordinates(int(re_link[1]), int(
+                    re_link[2]), int(re_link[3]), int(re_link[4]))
 
                 if re_link == message_destination:
                     re_link = None
@@ -2419,7 +2509,8 @@ class OGame(object):
             "ajax": "1",
         }
 
-        response = self.session.get(url=self.index_php + 'page=messages', params=payload).text
+        response = self.session.get(
+            url=self.index_php + 'page=messages', params=payload).text
         bs4 = BeautifulSoup4(response)
         msgs_raw = bs4.select("ul li")
         new_messages = []
@@ -2433,7 +2524,8 @@ class OGame(object):
                     raw = 0
                 new_messages.append(raw)
             i += 1
-        return new_messages  # [espionage, combat reports, expeditions, unions/transport, other]
+        # [espionage, combat reports, expeditions, unions/transport, other]
+        return new_messages
 
     def get_combat_reports_messages(self):
         tab_id = 21
@@ -2444,7 +2536,8 @@ class OGame(object):
         print(f"New Combatreports: {new_messages_counter[1]}")
         while int(page) <= int(nb_page):
             response = self.get_page_messages(page, tab_id)
-            new_messages, new_nb_page = self.extract_combat_summary_reports_message(response)
+            new_messages, new_nb_page = self.extract_combat_summary_reports_message(
+                response)
             msgs.append(new_messages)
             nb_page = new_nb_page
             page += 1
@@ -2456,7 +2549,8 @@ class OGame(object):
             "tab": '20',
             "ajax": "1",
         }
-        page_html = self.session.get(url=self.index_php + 'page=messages', params=payload).text
+        page_html = self.session.get(
+            url=self.index_php + 'page=messages', params=payload).text
         try:
             regex = r"name='token' value='([^']+)'"
             token = re.search(regex, page_html, re.MULTILINE).group(1)
@@ -2481,10 +2575,11 @@ class OGame(object):
             "ajax": "1",
         }
         if token:
-            self.session.post(url=self.index_php + 'page=messages', params=payload)
+            self.session.post(url=self.index_php +
+                              'page=messages', params=payload)
             return True
         else:
-            print(f'error deleting messages')
+            print('error deleting messages')
             return False
 
     def send_fleet(
@@ -2497,9 +2592,10 @@ class OGame(object):
     ):
         response = self.session.get(
             url=self.index_php + 'page=ingame&component=fleetdispatch&cp={}'
-                .format(id)
+            .format(id)
         ).text
-        send_fleet_token = re.search('var fleetSendingToken = "(.*)"', response)
+        send_fleet_token = re.search(
+            'var fleetSendingToken = "(.*)"', response)
         if send_fleet_token is None:
             send_fleet_token = re.search('var token = "(.*)"', response)
         form_data = {'token': send_fleet_token.group(1)}
@@ -2527,7 +2623,7 @@ class OGame(object):
         )
         response = self.session.post(
             url=self.index_php + 'page=ingame&component=fleetdispatch'
-                '&action=sendFleet&ajax=1&asJson=1',
+            '&action=sendFleet&ajax=1&asJson=1',
             data=form_data,
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).json()
@@ -2557,7 +2653,9 @@ class OGame(object):
             where,
     ):
         response = self.session.get(
-            url=self.index_php + 'page=ingame&component=galaxy&galaxy={}&system={}&position={}'.format(where[0], where[1], where[2])
+            url=self.index_php +
+            'page=ingame&component=galaxy&galaxy={}&system={}&position={}'.format(
+                where[0], where[1], where[2])
         ).text
         send_discovery_token = re.search('var token = "(.*)"', response)
         form_data = {'token': send_discovery_token.group(1)}
@@ -2569,7 +2667,8 @@ class OGame(object):
             }
         )
         response = self.session.post(
-            url=self.index_php + 'page=ingame&component=fleetdispatch&action=sendDiscoveryFleet&ajax=1&asJson=1',
+            url=self.index_php +
+            'page=ingame&component=fleetdispatch&action=sendDiscoveryFleet&ajax=1&asJson=1',
             data=form_data,
             headers={'X-Requested-With': 'XMLHttpRequest'}
         ).json()
@@ -2584,8 +2683,8 @@ class OGame(object):
         component = what[2]
         response = self.session.get(
             url=self.index_php +
-                'page=ingame&component={}&cp={}'
-                .format(component, id)
+            'page=ingame&component={}&cp={}'
+            .format(component, id)
         ).text
         build_token = re.search(
             "var urlQueueAdd = (.*)token=(.*)';",
@@ -2609,8 +2708,8 @@ class OGame(object):
             return
         response = self.session.get(
             url=self.index_php +
-                'page=ingame&component={}&cp={}'
-                .format(component, id)
+            'page=ingame&component={}&cp={}'
+            .format(component, id)
         ).text
         deconstruct_token = re.search(
             r"var downgradeEndpoint = (.*)token=(.*)&",
@@ -2660,15 +2759,15 @@ class OGame(object):
     def collect_rubble_field(self, id):
         self.session.get(
             url=self.index_php +
-                'page=ajax&component=repairlayer&component=repairlayer&ajax=1'
-                '&action=startRepairs&asJson=1&cp={}'
-                .format(id),
+            'page=ajax&component=repairlayer&component=repairlayer&ajax=1'
+            '&action=startRepairs&asJson=1&cp={}'
+            .format(id),
             headers={'X-Requested-With': 'XMLHttpRequest'})
 
     def vacation_mode(self, activate=True):
         response = self.session.get(
             url=self.index_php + 'page=ingame&component=preferences'
-                .format(id),
+            .format(id),
             headers={'X-Requested-With': 'XMLHttpRequest'})
         bs4 = BeautifulSoup4(response.text)
         vacation_mode = bs4.find("div", id="advice-bar").a
@@ -2686,7 +2785,8 @@ class OGame(object):
             if not vacation_mode and activate:
                 return False
 
-        activate_token = re.search("name='token' value='(.*)'", response.text).group(1)
+        activate_token = re.search(
+            "name='token' value='(.*)'", response.text).group(1)
         form_data = {'mode': 'save',
                      'selectedTab': 0,
                      'token': activate_token,

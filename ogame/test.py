@@ -1,5 +1,6 @@
 import unittest
 from random import randint
+
 from ogame.constants import *
 
 
@@ -200,7 +201,7 @@ class UnittestOgame(unittest.TestCase):
         self.assertFalse(after.in_construction)
 
     def test_phalanx(self):
-        Super_Dangereous_TO_test = 'You will get Banned'
+        pass
 
     def test_send_message(self):
         send_message = False
