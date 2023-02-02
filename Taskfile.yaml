@@ -18,3 +18,9 @@ tasks:
       - vt
     cmds:
       - poetry run pytest -v {{.CLI_ARGS}}
+
+  build:
+    aliases:
+      - b
+    cmds:
+      - poetry build
