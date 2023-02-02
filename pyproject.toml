@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "pyogame"
+version = "9.0.0-alpha"
+description = "lib for the popular browsergame ogame"
+authors = ["PapeprPieceCode <marcos.gam@hotmail.com>, Federico Lolli <federico123579@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.28.2"
+beautifulsoup4 = "^4.11.2"
+html5lib = "^1.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.2.1"
+jupyterlab = "^3.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
