@@ -2,5 +2,10 @@
 user.py
 *.bat
 *.pyc
+.env
 venv
 env
+
+__pycache__
+.pytest_cache
+.vscode
