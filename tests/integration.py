@@ -1,7 +1,7 @@
 import unittest
 from random import randint
 
-from ogame.constants import (
+from pyogame.constants import (
     buildings,
     coordinates,
     fleet,

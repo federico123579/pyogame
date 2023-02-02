@@ -6,10 +6,7 @@ from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
 
-try:
-    import constants as const
-except ImportError:
-    import ogame.constants as const
+import pyogame.constants as const
 
 
 class OGame(object):
@@ -147,9 +144,9 @@ class OGame(object):
             self.solve_captcha(challenge)
 
     def test(self):
-        import ogame.test
+        import tests.integration
         ogame.test.UnittestOgame.empire = self
-        suite = unittest.TestLoader().loadTestsFromModule(ogame.test)
+        suite = unittest.TestLoader().loadTestsFromModule(tests.integration)
         return unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
 
     def server(self):
