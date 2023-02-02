@@ -4,7 +4,7 @@ from random import randint
 import pytest
 from dotenv import load_dotenv
 
-from pyogame import OGame
+from pyogame.agent import OGame
 from pyogame.constants import (
     buildings,
     coordinates,
