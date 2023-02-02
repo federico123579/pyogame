@@ -1,0 +1,20 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task: verbose-test
+
+  quiet-test:
+    aliases:
+      - qt
+    cmds:
+      - poetry run pytest --tb=no -q {{.CLI_ARGS}}
+
+  verbose-test:
+    aliases:
+      - vt
+    cmds:
+      - poetry run pytest -v {{.CLI_ARGS}}
