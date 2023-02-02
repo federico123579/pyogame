@@ -460,7 +460,8 @@ def price(technology, level=1):
         elif technology[0] == 44:
             return resources(20000 * 2 ** level, 20000 * 2 ** level, 1000 * 2 ** level)
         elif technology[0] == 15:
-            return resources(1000000 * 2 ** level, 500000 * 2 ** level, 100000 * 2 ** level)
+            return resources(1000000 * 2 ** level, 500000 * 2 ** level,
+                             100000 * 2 ** level)
         elif technology[0] == 33:
             return resources(crystal=50000 * 2 ** level, deuterium=100000 * 2 ** level)
         elif technology[0] == 36:
@@ -516,9 +517,11 @@ def price(technology, level=1):
         elif technology[0] == 108:
             return resources(crystal=400 * 2 ** level, deuterium=600 * 2 ** level)
         elif technology[0] == 124:
-            return resources(4000 * 1.75 ** level, 8000 * 1.75 ** level, 4000 * 1.75 ** level)
+            return resources(4000 * 1.75 ** level, 8000 * 1.75 ** level,
+                             4000 * 1.75 ** level)
         elif technology[0] == 123:
-            return resources(240000 * 2 ** level, 400000 * 2 ** level, 160000 * 2 ** level)
+            return resources(240000 * 2 ** level, 400000 * 2 ** level,
+                             160000 * 2 ** level)
         elif technology[0] == 109:
             return resources(metal=800 * 2 ** level, crystal=200 * 2 ** level)
         elif technology[0] == 110:

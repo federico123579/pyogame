@@ -240,8 +240,8 @@ class OGame(object):
                 player_id = int(rawy['id'].replace("position", ""))
                 rank = int(
                     rawy.find('td', attrs={'class': 'position'}).text.strip())
-                points = int(rawy.find('td', attrs={'class': 'score'}).text.strip().replace(
-                    ".", "").replace(",", ""))
+                points = int(rawy.find('td', attrs={'class': 'score'}).text.strip()
+                             .replace(".", "").replace(",", ""))
                 list = [
                     name, player_id, rank, points
                 ]
@@ -305,7 +305,8 @@ class OGame(object):
                     else:
                         listofelems[index][0] = elem[0] + item_duration[0]
                 else:
-                    if listofelems[index][0][:9] == listofelems[max(index - 1, 0)][0][:9]:
+                    if listofelems[index][0][:9] == listofelems[
+                            max(index - 1, 0)][0][:9]:
                         listofelems[index][0] = listofelems[index][0] + \
                             item_duration[2]
         return listofelems
@@ -1100,13 +1101,14 @@ class OGame(object):
         for container_tiers in bs4.select('#technologies div li'):
             try:
                 technology_status.append(container_tiers['data-status'])
-            except:
+            except Exception:
                 technology_status.append('not available')
         print(f'DEBUG technology_status {technology_status}')
 
         class LfResearch:
             def __init__(self, i):
-                if i <= technology_status.count('on')+technology_status.count('disabled')-1:
+                if i <= technology_status.count(
+                        'on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
                     self.in_construction = OGame.inConstruction(
@@ -1159,13 +1161,14 @@ class OGame(object):
         for container_tiers in bs4.select('#technologies div li'):
             try:
                 technology_status.append(container_tiers['data-status'])
-            except:
+            except Exception:
                 technology_status.append('not available')
         print(f'DEBUG technology_status {technology_status}')
 
         class LfResearch:
             def __init__(self, i):
-                if i <= technology_status.count('on')+technology_status.count('disabled')-1:
+                if i <= technology_status.count(
+                        'on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
                     self.in_construction = OGame.inConstruction(
@@ -1218,13 +1221,14 @@ class OGame(object):
         for container_tiers in bs4.select('#technologies div li'):
             try:
                 technology_status.append(container_tiers['data-status'])
-            except:
+            except Exception:
                 technology_status.append('not available')
         print(f'DEBUG technology_status {technology_status}')
 
         class LfResearch:
             def __init__(self, i):
-                if i <= technology_status.count('on')+technology_status.count('disabled')-1:
+                if i <= technology_status.count(
+                        'on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
                     self.in_construction = OGame.inConstruction(
@@ -1277,13 +1281,14 @@ class OGame(object):
         for container_tiers in bs4.select('#technologies div li'):
             try:
                 technology_status.append(container_tiers['data-status'])
-            except:
+            except Exception:
                 technology_status.append('not available')
         print(f'DEBUG technology_status {technology_status}')
 
         class LfResearch:
             def __init__(self, i):
-                if i <= technology_status.count('on')+technology_status.count('disabled')-1:
+                if i <= technology_status.count(
+                        'on')+technology_status.count('disabled')-1:
                     self.level = levels[i]
                     self.is_possible = OGame.isPossible(technology_status[i])
                     self.in_construction = OGame.inConstruction(
@@ -1449,9 +1454,11 @@ class OGame(object):
                 status.append("banned_filter")
             if row.find('span', class_='status_abbr_honorableTarget'):
                 status.append("honorableTarget_filter")
-            if row.find('span', class_=['rank_bandit1', 'rank_bandit2', 'rank_bandit3']):
+            if row.find('span', class_=[
+                    'rank_bandit1', 'rank_bandit2', 'rank_bandit3']):
                 status.append("bandit_filter")
-            if row.find('span', class_=['rank_starlord1', 'rank_starlord2', 'rank_starlord3']):
+            if row.find('span', class_=[
+                    'rank_starlord1', 'rank_starlord2', 'rank_starlord3']):
                 status.append("honorableTarget_filter")
             if 'empty_filter' in status:
                 continue
@@ -1636,11 +1643,13 @@ class OGame(object):
         destin = Coords.replace("destCoords", "destFleet")\
                        .replace("coordsOrigin", "originFleet")\
                        .replace("destinationCoords", "destinationData")\
-                       .replace("originCoords", "originData")                  # for hostile/friendly_fleets
+                       .replace("originCoords", "originData")
         destination = [
             dest.find(class_=destin).find('figure', {'class': 'planetIcon'})
-            if dest.find(class_=destin).find('figure', {'class': 'planetIcon'}) is not None
-            else BeautifulSoup4('<figure class="planetIcon planet"></figure>').find("figure")
+            if dest.find(class_=destin).find(
+                'figure', {'class': 'planetIcon'}) is not None
+            else BeautifulSoup4(
+                '<figure class="planetIcon planet"></figure>').find("figure")
             for dest in event
         ]
         destination = [
@@ -1807,7 +1816,8 @@ class OGame(object):
                 "title=\'": 'title=""'
             }
             regex = re.compile("(%s)" % "|".join(map(re.escape, dict.keys())))
-            return regex.sub(lambda mo: dict[mo.string[mo.start():mo.end()]], str(table))
+            return regex.sub(
+                lambda mo: dict[mo.string[mo.start():mo.end()]], str(table))
 
         if not ship_names or len(ship_names) < 15:
             ship_names = self.tooltip_names_import()[:15]
@@ -2004,7 +2014,7 @@ class OGame(object):
         if content.table:
             return True
         else:
-            # output 'You have already sent a request to this player.' / 'Invalid player.'
+            # output 'You have already sent a request to this player' / 'Invalid player'
             print(" ".join(content.text.split()))
             return False
 
@@ -2107,10 +2117,12 @@ class OGame(object):
         for data in messages:
             chat_history = []
             if data['unreadCounter'] >= 1:
-                response2 = self.session.post(url=self.index_php + 'page=ajaxChat',
-                                              data={'playerId': int(data['partnerId']), 'mode': 2,
-                                                    'ajax': 1, 'updateUnread': 1},
-                                              headers={'X-Requested-With': 'XMLHttpRequest'})  # read message/mark as read
+                response2 = self.session.post(
+                    url=self.index_php + 'page=ajaxChat',
+                    data={'playerId': int(data['partnerId']), 'mode': 2, 
+                          'ajax': 1, 'updateUnread': 1},
+                    # read message/mark as read
+                    headers={'X-Requested-With': 'XMLHttpRequest'})
                 chat_data = response2.json()['data']
                 chat_overview = response2.json()['chatItems']
                 authors_list = re.findall(r'w">\n (.*)</', chat_data)
@@ -2265,7 +2277,8 @@ class OGame(object):
                 else:
                     for tech in tech_list.find_all('li', {'class': 'detail_list_el'}):
                         tech_id = int(
-                            re.search(r'([0-9]+)', tech.find('img')['class'][0]).group(1))
+                            re.search(r'([0-9]+)', tech.find(
+                                'img')['class'][0]).group(1))
                         tech_amount = int(
                             tech.find('span', 'fright').text.replace('.', ''))
                         yield (tech_id, tech_amount)
@@ -2400,8 +2413,9 @@ class OGame(object):
             else:
                 message_destination_type = 1
                 fleet_lost_first_round_message = True
-            message_destination = const.coordinates(int(message_destination[0]), int(message_destination[1]),
-                                                    int(message_destination[2]), int(message_destination_type))
+            message_destination = const.coordinates(
+                int(message_destination[0]), int(message_destination[1]),
+                int(message_destination[2]), int(message_destination_type))
 
             if not fleet_lost_first_round_message:
                 res_title = msg_raw.select("span.msg_content div.combatLeftSide span")[
@@ -2450,7 +2464,7 @@ class OGame(object):
                     moon_chance_message = message_text[5].text
                     moon_chance_message = moon_chance_message[
                         moon_chance_message.find(":") + 1:moon_chance_message.find("%")]
-                except:
+                except Exception:
                     moon_chance_message = None
 
                 # monn_created_message = # ToDo Find color green?....
@@ -2459,7 +2473,8 @@ class OGame(object):
                     "div.msg_actions a span.icon_attack").parent)
                 link = link.replace("&amp;", "&")
                 re_link = re.search(
-                    'galaxy=(\\d+)&system=(\\d+)&position=(\\d+)&type=(\\d+)&', str(link))
+                    'galaxy=(\\d+)&system=(\\d+)&position=(\\d+)&type=(\\d+)&',
+                    str(link))
                 re_link = const.coordinates(int(re_link[1]), int(
                     re_link[2]), int(re_link[3]), int(re_link[4]))
 
@@ -2495,8 +2510,8 @@ class OGame(object):
                 repaired = repaired_message
                 moon_chance = moon_chance_message
                 list = [
-                    id, destination, fleet_lost_first_round, resources, df, loot, created_at,
-                    origin, attacker_name, attacker_lost, defender_name,
+                    id, destination, fleet_lost_first_round, resources, df, loot,
+                    created_at, origin, attacker_name, attacker_lost, defender_name,
                     defender_lost, repaired, moon_chance
                 ]
 
@@ -2675,7 +2690,8 @@ class OGame(object):
         if response['response']['success']:
             return response['response']['success'], response['response']['message']
         else:
-            return response['response']['success'], response['response']['errors'][0]['message']
+            return response['response']['success'], response[
+                'response']['errors'][0]['message']
 
     def build(self, what, id):
         btype = what[0]
@@ -2766,7 +2782,7 @@ class OGame(object):
 
     def vacation_mode(self, activate=True):
         response = self.session.get(
-            url=self.index_php + 'page=ingame&component=preferences'
+            url=self.index_php + 'page=ingame&component=preferences' #FIXME
             .format(id),
             headers={'X-Requested-With': 'XMLHttpRequest'})
         bs4 = BeautifulSoup4(response.text)
@@ -2839,7 +2855,7 @@ class OGame(object):
     def keep_going(self, function):
         try:
             function()
-        except:
+        except Exception:
             self.relogin()
             function()
 

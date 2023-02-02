@@ -1,7 +1,18 @@
 import unittest
 from random import randint
 
-from ogame.constants import *
+from ogame.constants import (
+    buildings,
+    coordinates,
+    fleet,
+    mission,
+    price,
+    research,
+    resources,
+    ships,
+    speed,
+    status,
+)
 
 
 class UnittestOgame(unittest.TestCase):
@@ -151,16 +162,16 @@ class UnittestOgame(unittest.TestCase):
 
     def test_fleet(self):
         UnittestOgame.test_send_fleet(self)
-        for fleet in self.empire.fleet():
-            self.assertIsInstance(fleet.id, int)
-            if fleet.mission == mission.spy:
-                self.assertTrue(fleet.mission == mission.spy)
+        for fl in self.empire.fleet():
+            self.assertIsInstance(fl.id, int)
+            if fl.mission == mission.spy:
+                self.assertTrue(fl.mission == mission.spy)
 
     def test_return_fleet(self):
         UnittestOgame.test_send_fleet(self)
-        for fleet in self.empire.fleet():
-            if fleet.mission == mission.spy and not fleet.returns:
-                fleet_returning = self.empire.return_fleet(fleet.id)
+        for fl in self.empire.fleet():
+            if fl.mission == mission.spy and not fl.returns:
+                fleet_returning = self.empire.return_fleet(fl.id)
                 self.assertTrue(fleet_returning)
 
     def test_build(self):
