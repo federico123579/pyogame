@@ -46,16 +46,10 @@ empire = OGame(UNI, USER, PASSWORD, user_agent='NCSA_Mosaic/2.0 (Windows 3.1)',
 </pre>
 
 ### test
+Insert your credentials in a .env file (OGAME_UNI, OGAME_USER and OGAME_PASS) in the root folder and run tests with pytest.
+
 <pre>
-This is a command that will try to run all functions with parameters. 
-empire.test()                       returns bool
-
-If this lib is running for long time it is recommended to test it during run time. 
-If it fails you can set up a telegram message. A test creates alot of traffic
-
-if not empire.test():
-    raise RuntimeWarning("Pyogame test failed, there are functions that dont work anymore. Be Careful")
-    # warn the User
+pytest -v
 </pre>
 
 ### get attacked
