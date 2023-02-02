@@ -1,6 +1,5 @@
 import json
 import re
-import unittest
 from datetime import datetime, timedelta
 
 import requests
@@ -142,12 +141,6 @@ class OGame(object):
             return True
         else:
             self.solve_captcha(challenge)
-
-    def test(self):
-        import tests.integration
-        ogame.test.UnittestOgame.empire = self
-        suite = unittest.TestLoader().loadTestsFromModule(tests.integration)
-        return unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
 
     def server(self):
         class Server:

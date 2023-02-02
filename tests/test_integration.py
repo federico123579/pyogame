@@ -1,6 +1,10 @@
-import unittest
+import os
 from random import randint
 
+import pytest
+from dotenv import load_dotenv
+
+from pyogame import OGame
 from pyogame.constants import (
     buildings,
     coordinates,
@@ -15,8 +19,17 @@ from pyogame.constants import (
 )
 
 
-class UnittestOgame(unittest.TestCase):
-    empire = None
+def get_ogame():
+    load_dotenv()
+    return OGame(
+        os.getenv("OGAME_UNI"),
+        os.getenv("OGAME_USER"),
+        os.getenv("OGAME_PASS"),
+    )
+
+
+class TestOGame:
+    empire = get_ogame()
     ids = []
 
     def collect_all_ids(self):
@@ -24,156 +37,149 @@ class UnittestOgame(unittest.TestCase):
         self.ids.extend(self.empire.moon_ids())
 
     def test_Vars(self):
-        self.assertTrue(isinstance(self.empire.token, str))
+        assert isinstance(self.empire.token, str)
 
     def test_Events(self):
-        self.assertIsInstance(self.empire.attacked(), bool)
-        self.assertIsInstance(self.empire.neutral(), bool)
-        self.assertIsInstance(self.empire.friendly(), bool)
+        assert isinstance(self.empire.attacked(), bool)
+        assert isinstance(self.empire.neutral(), bool)
+        assert isinstance(self.empire.friendly(), bool)
 
     def test_Constants(self):
         speed = self.empire.server().Speed
-        self.assertGreater(speed.universe, 0)
-        self.assertGreater(speed.fleet, 0)
+        assert speed.universe > 0
+        assert speed.fleet > 0
 
-        self.assertIsInstance(self.empire.character_class(), str)
+        assert isinstance(self.empire.character_class(), str)
 
-        self.assertIsInstance(self.empire.rank(), int)
+        assert isinstance(self.empire.rank(), int)
 
-        self.assertGreater(len(self.empire.planet_ids()), 0)
+        assert len(self.empire.planet_ids()) > 0
         planets_names = self.empire.planet_names()
-        self.assertGreater(len(planets_names), 0)
-        self.assertIsInstance(
+        assert len(planets_names) > 0
+        assert isinstance(
             self.empire.id_by_planet_name(planets_names[0]), int
         )
-        self.assertIsInstance(self.empire.planet_coords(), list)
-        self.assertGreater(len(self.empire.moon_ids()), -1)
-        self.assertGreater(len(self.empire.moon_names()), -1)
-        self.assertIsInstance(self.empire.moon_coords(), list)
+        assert isinstance(self.empire.planet_coords(), list)
+        assert len(self.empire.moon_ids()) > -1
+        assert len(self.empire.moon_names()) > -1
+        assert isinstance(self.empire.moon_coords(), list)
 
         self.collect_all_ids()
 
-        self.assertTrue(buildings.is_supplies(buildings.metal_mine))
-        self.assertTrue(
-            buildings.building_name(buildings.metal_mine) == 'metal_mine'
-        )
-        self.assertTrue(buildings.is_facilities(buildings.shipyard))
-        self.assertTrue(buildings.is_defenses(buildings.rocket_launcher(10)))
-        self.assertTrue(
-            buildings.defense_name(
-                buildings.rocket_launcher()
-            ) == 'rocket_launcher'
-        )
-        self.assertTrue(research.is_research(research.energy))
-        self.assertTrue(
-            research.research_name(research.energy) == 'energy'
-        )
-        self.assertTrue(ships.is_ship(ships.small_transporter(99)))
-        self.assertTrue(
-            ships.ship_name(ships.light_fighter()) == 'light_fighter'
-        )
-        self.assertTrue(ships.ship_amount(ships.light_fighter(99)) == 99)
-        self.assertEqual(resources(99, 99, 99), [99, 99, 99])
-        self.assertEqual([3459, 864, 0], price(buildings.metal_mine, level=10))
+        assert buildings.is_supplies(buildings.metal_mine)
+        assert buildings.building_name(buildings.metal_mine) == 'metal_mine'
+        assert buildings.is_facilities(buildings.shipyard)
+        assert buildings.is_defenses(buildings.rocket_launcher(10))
+        assert buildings.defense_name(buildings.rocket_launcher()) == 'rocket_launcher'
+        assert research.is_research(research.energy)
+        assert research.research_name(research.energy) == 'energy'
+        assert ships.is_ship(ships.small_transporter(99))
+        assert ships.ship_name(ships.light_fighter()) == 'light_fighter'
+        assert ships.ship_amount(ships.light_fighter(99)) == 99
+        assert resources(99, 99, 99) == [99, 99, 99]
+        assert [3459, 864, 0] == price(buildings.metal_mine, level=10)
 
     def test_slot_celestial(self):
         slot = self.empire.slot_celestial()
-        self.assertGreater(slot.total, 0)
+        assert slot.total > 0
 
     def test_celestial(self):
         celestial = self.empire.celestial(id)
-        self.assertGreater(celestial.diameter, 0)
-        self.assertGreater(celestial.free, -1)
-        self.assertIsInstance(celestial.temperature, list)
+        assert celestial.diameter > 0
+        assert celestial.free > -1
+        assert isinstance(celestial.temperature, list)
 
     def test_celestial_coordinates(self):
         for id in self.ids:
             celestial_coordinates = self.empire.celestial_coordinates(id)
-            self.assertIsInstance(celestial_coordinates, list)
-            self.assertEqual(len(celestial_coordinates), 4)
+            assert isinstance(celestial_coordinates, list)
+            assert len(celestial_coordinates) == 4
 
     def test_celestial_queue(self):
         for id in self.ids:
             celestial_queue = self.empire.celestial_queue(id)
-            self.assertIsInstance(celestial_queue.list, list)
+            assert isinstance(celestial_queue.list, list)
 
     def test_resources(self):
         for id in self.ids:
             res = self.empire.resources(id)
-            self.assertIsInstance(res.resources, list)
-            self.assertGreater(res.darkmatter, 0)
-            self.assertIsInstance(res.energy, int)
+            assert isinstance(res.resources, list)
+            assert res.darkmatter > 0
+            assert isinstance(res.energy, int)
 
     def test_resources_settings(self):
         settings = self.empire.resources_settings(
             self.ids[0],
             settings={buildings.metal_mine: speed.min}
         )
-        self.assertEqual(settings.metal_mine, 10)
+        assert settings.metal_mine == 10
         settings = self.empire.resources_settings(
             self.ids[0],
             settings={buildings.metal_mine: speed.max}
         )
-        self.assertEqual(settings.metal_mine, 100)
+        assert settings.metal_mine == 100
 
     def test_supply(self):
         sup = self.empire.supply(self.ids[0])
-        self.assertTrue(0 < sup.metal_mine.level)
+        assert 0 < sup.metal_mine.level
 
     def test_facilities(self):
         fac = self.empire.facilities(self.ids[0])
-        self.assertTrue(0 < fac.robotics_factory.level)
+        assert 0 < fac.robotics_factory.level
 
     def test_moon_facilities(self):
         fac = self.empire.moon_facilities(self.ids[0])
-        self.assertTrue(0 < fac.robotics_factory.level)
+        assert 0 < fac.robotics_factory.level
 
     def test_research(self):
         res = self.empire.research()
-        self.assertGreater(res.energy.level, -1)
+        assert res.energy.level > -1
 
     def test_ships(self):
         ship = self.empire.ships(self.ids[0])
-        self.assertGreater(ship.light_fighter.amount, -1)
+        assert ship.light_fighter.amount > -1
 
     def test_defences(self):
         defence = self.empire.defences(self.ids[0])
-        self.assertGreater(defence.rocket_launcher.amount, -1)
+        assert defence.rocket_launcher.amount > -1
 
     def test_galaxy(self):
         for position in self.empire.galaxy(coordinates(1, 1)):
-            self.assertIsInstance(position.player, str)
-            self.assertIsInstance(position.list, list)
-            self.assertIsInstance(position.moon, bool)
+            assert isinstance(position.player, str)
+            assert isinstance(position.list, list)
+            assert isinstance(position.moon, bool)
 
     def test_galaxy_debris(self):
         for position in self.empire.galaxy_debris(coordinates(1, 1)):
-            self.assertIsInstance(position.position, list)
-            self.assertIsInstance(position.has_debris, bool)
-            self.assertIsInstance(position.metal, int)
-            self.assertEqual(position.deuterium, 0)
+            assert isinstance(position.position, list)
+            assert isinstance(position.has_debris, bool)
+            assert isinstance(position.metal, int)
+            assert position.deuterium == 0
 
     def test_ally(self):
-        self.assertIsInstance(self.empire.ally(), list)
+        assert isinstance(self.empire.ally(), list)
 
     def test_slot_fleet(self):
         slot = self.empire.slot_fleet()
-        self.assertGreater(slot.fleet.total, 0)
+        assert slot.fleet.total > 0
 
+    @pytest.mark.social
     def test_fleet(self):
-        UnittestOgame.test_send_fleet(self)
+        self.test_send_fleet()
         for fl in self.empire.fleet():
-            self.assertIsInstance(fl.id, int)
+            assert isinstance(fl.id, int)
             if fl.mission == mission.spy:
-                self.assertTrue(fl.mission == mission.spy)
+                assert fl.mission == mission.spy
 
+    @pytest.mark.social
     def test_return_fleet(self):
-        UnittestOgame.test_send_fleet(self)
+        self.test_send_fleet()
         for fl in self.empire.fleet():
             if fl.mission == mission.spy and not fl.returns:
                 fleet_returning = self.empire.return_fleet(fl.id)
-                self.assertTrue(fleet_returning)
+                assert fleet_returning
 
+    @pytest.mark.dirty
     def test_build(self):
         before = self.empire.defences(
             self.ids[0]
@@ -185,14 +191,15 @@ class UnittestOgame(unittest.TestCase):
         after = self.empire.defences(
             self.ids[0]
         ).rocket_launcher
-        self.assertTrue(before < after.amount or after.in_construction)
+        assert before < after.amount or after.in_construction
 
+    @pytest.mark.dirty
     def test_deconstruct_and_cancel(self):
         before = self.empire.supply(
             self.ids[0]
         ).metal_mine
-        self.assertGreater(before.level, 0)
-        self.assertFalse(before.in_construction)
+        assert before.level > 0
+        assert not before.in_construction
         self.empire.deconstruct(
             what=buildings.metal_mine,
             id=self.ids[0]
@@ -200,20 +207,22 @@ class UnittestOgame(unittest.TestCase):
         after = self.empire.supply(
             self.ids[0]
         ).metal_mine
-        self.assertTrue(before.level > after.level or after.in_construction)
+        assert before.level > after.level or after.in_construction
         before = self.empire.supply(
             self.ids[0]
         ).metal_mine
-        self.assertTrue(before.in_construction)
+        assert before.in_construction
         self.empire.cancel_building(self.ids[0])
         after = self.empire.supply(
             self.ids[0]
         ).metal_mine
-        self.assertFalse(after.in_construction)
+        assert not after.in_construction
 
     def test_phalanx(self):
         pass
 
+    @pytest.mark.slow
+    @pytest.mark.social
     def test_send_message(self):
         send_message = False
         while not send_message:
@@ -226,16 +235,17 @@ class UnittestOgame(unittest.TestCase):
                         'Hello'
                     )
                     break
-        self.assertEqual(send_message, True)
+        assert send_message
 
     def test_spyreports(self):
         for report in self.empire.spyreports():
-            self.assertIsInstance(report.name, str)
-            self.assertIsInstance(report.position, list)
-            self.assertIsInstance(report.metal, int)
-            self.assertIsInstance(report.resources, list)
-            self.assertIsInstance(report.fleet, dict)
+            assert isinstance(report.name, str)
+            assert isinstance(report.position, list)
+            assert isinstance(report.metal, int)
+            assert isinstance(report.resources, list)
+            assert isinstance(report.fleet, dict)
 
+    @pytest.mark.social
     def test_send_fleet(self):
         espionage_probe = self.empire.ships(self.ids[0]).espionage_probe.amount
         if not 0 < espionage_probe:
@@ -257,7 +267,7 @@ class UnittestOgame(unittest.TestCase):
                         ships=fleet(espionage_probe=1)
                     )
                     break
-        self.assertTrue(fleet_send)
+        assert fleet_send
 
     def test_collect_rubble_field(self):
         self.empire.collect_rubble_field(self.ids[0])
@@ -265,12 +275,12 @@ class UnittestOgame(unittest.TestCase):
     def test_relogin(self):
         self.empire.logout()
         self.empire.relogin()
-        self.assertTrue(self.empire.is_logged_in())
+        assert self.empire.is_logged_in()
 
     def test_officers(self):
         officers = self.empire.officers()
-        self.assertIsInstance(officers.commander, bool)
-        self.assertIsInstance(officers.admiral, bool)
-        self.assertIsInstance(officers.engineer, bool)
-        self.assertIsInstance(officers.geologist, bool)
-        self.assertIsInstance(officers.technocrat, bool)
+        assert isinstance(officers.commander, bool)
+        assert isinstance(officers.admiral, bool)
+        assert isinstance(officers.engineer, bool)
+        assert isinstance(officers.geologist, bool)
+        assert isinstance(officers.technocrat, bool)
